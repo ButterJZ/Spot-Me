@@ -1,8 +1,8 @@
 const { getMatches } = require('../src/matcher');
 
 const base = {
-  userId: 'u1', name: 'Alex', gym: 'LA Fitness',
-  focus: ['Chest', 'Arms'], days: ['Mon', 'Wed'], timeSlot: '6pm-7pm'
+  userId: 'u1', name: 'Alex', gym: 'Anytime Fitness - Downtown',
+  focus: 'Strength', slots: ['Mon 7pm', 'Wed 7pm']
 };
 
 test('returns empty array when no other users', () => {
@@ -15,65 +15,56 @@ test('excludes self from results', () => {
 
 test('excludes users with score 0', () => {
   const noOverlap = {
-    userId: 'u2', name: 'Sam', gym: 'Planet Fitness',
-    focus: ['Yoga'], days: ['Tue'], timeSlot: '7am-8am'
+    userId: 'u2', name: 'Sam', gym: 'Fit Factory - West',
+    focus: 'Fat Loss', slots: ['Tue 6am']
   };
   expect(getMatches(base, [noOverlap])).toEqual([]);
 });
 
 test('scores gym match', () => {
   const sameGym = {
-    userId: 'u2', name: 'Sam', gym: 'LA Fitness',
-    focus: ['Yoga'], days: ['Tue'], timeSlot: '7am-8am'
+    userId: 'u2', name: 'Sam', gym: 'Anytime Fitness - Downtown',
+    focus: 'Fat Loss', slots: ['Tue 6am']
   };
   const [match] = getMatches(base, [sameGym]);
   expect(match.score).toBe(1);
 });
 
-test('scores same timeSlot', () => {
-  const sameSlot = {
+test('scores same focus', () => {
+  const sameFocus = {
     userId: 'u2', name: 'Sam', gym: 'Other',
-    focus: [], days: ['Fri'], timeSlot: '6pm-7pm'
+    focus: 'Strength', slots: ['Tue 6am']
   };
-  const [match] = getMatches(base, [sameSlot]);
+  const [match] = getMatches(base, [sameFocus]);
   expect(match.score).toBe(1);
 });
 
-test('scores shared days', () => {
-  const sharedDays = {
+test('scores shared slots', () => {
+  const sharedSlots = {
     userId: 'u2', name: 'Sam', gym: 'Other',
-    focus: [], days: ['Mon', 'Wed'], timeSlot: '7am-8am'
+    focus: 'Fat Loss', slots: ['Mon 7pm', 'Wed 7pm']
   };
-  const [match] = getMatches(base, [sharedDays]);
+  const [match] = getMatches(base, [sharedSlots]);
   expect(match.score).toBe(2);
 });
 
-test('scores shared focus', () => {
-  const sharedFocus = {
-    userId: 'u2', name: 'Sam', gym: 'Other',
-    focus: ['Chest', 'Arms'], days: ['Fri'], timeSlot: '7am-8am'
-  };
-  const [match] = getMatches(base, [sharedFocus]);
-  expect(match.score).toBe(2);
-});
-
-test('combined score: gym + timeSlot + days + focus', () => {
+test('combined score: gym + focus + slots', () => {
   const perfect = {
-    userId: 'u2', name: 'Sam', gym: 'LA Fitness',
-    focus: ['Chest'], days: ['Mon'], timeSlot: '6pm-7pm'
+    userId: 'u2', name: 'Sam', gym: 'Anytime Fitness - Downtown',
+    focus: 'Strength', slots: ['Mon 7pm', 'Wed 7pm']
   };
   const [match] = getMatches(base, [perfect]);
-  expect(match.score).toBe(4); // gym(1) + timeSlot(1) + days(1) + focus(1)
+  expect(match.score).toBe(4); // gym(1) + focus(1) + slots(2)
 });
 
 test('results sorted descending by score', () => {
   const weak = {
     userId: 'u2', name: 'Weak', gym: 'Other',
-    focus: ['Chest'], days: ['Fri'], timeSlot: '7am-8am'
+    focus: 'Strength', slots: ['Fri 7pm']
   };
   const strong = {
-    userId: 'u3', name: 'Strong', gym: 'LA Fitness',
-    focus: ['Chest'], days: ['Mon'], timeSlot: '6pm-7pm'
+    userId: 'u3', name: 'Strong', gym: 'Anytime Fitness - Downtown',
+    focus: 'Strength', slots: ['Mon 7pm']
   };
   const results = getMatches(base, [weak, strong]);
   expect(results[0].userId).toBe('u3');
@@ -82,8 +73,8 @@ test('results sorted descending by score', () => {
 
 test('match result includes score field and all user fields', () => {
   const sameGym = {
-    userId: 'u2', name: 'Sam', gym: 'LA Fitness',
-    focus: [], days: [], timeSlot: '7am-8am'
+    userId: 'u2', name: 'Sam', gym: 'Anytime Fitness - Downtown',
+    focus: 'Fat Loss', slots: []
   };
   const [match] = getMatches(base, [sameGym]);
   expect(match).toHaveProperty('score');
