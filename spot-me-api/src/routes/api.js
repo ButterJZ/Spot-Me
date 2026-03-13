@@ -19,6 +19,8 @@ router.post('/profile', (req, res) => {
   res.status(201).json(user);
 });
 
+// P4 Firestore handoff: if db.getUser/getAllUsers become async, make this handler
+// async and await both calls — otherwise matches will silently return nothing.
 router.get('/matches/:userId', (req, res) => {
   const user = db.getUser(req.params.userId);
   if (!user) return res.status(404).json({ error: 'User not found' });
