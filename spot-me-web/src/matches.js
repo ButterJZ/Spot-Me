@@ -1,35 +1,75 @@
+const makeAvatar = (name, bg = "#1c1c1c", fg = "#ff4d4d") => {
+  const initials = name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
+
+  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='320' height='400' viewBox='0 0 320 400'><rect width='320' height='400' rx='24' fill='${bg}'/><circle cx='160' cy='140' r='66' fill='#2f2f2f'/><path d='M70 330c20-60 70-90 90-90s70 30 90 90' fill='#2f2f2f'/><text x='160' y='370' text-anchor='middle' fill='${fg}' font-family='Arial, sans-serif' font-size='40' font-weight='700'>${initials}</text></svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+};
+
 const users = [
   {
     id: "u-201",
-    name: "Ari",
+    name: "Ari Stone",
+    age: 24,
     gym: "Anytime Fitness - Downtown",
     focus: "Strength",
     slots: ["Mon 7pm", "Wed 7pm", "Sat 10am"],
-    bio: "Calm sets, strict form, no ego lifts."
+    bio: "Calm sets, strict form, no ego lifts.",
+    photo: makeAvatar("Ari Stone", "#181818")
   },
   {
     id: "u-202",
-    name: "Maya",
+    name: "Maya Chen",
+    age: 22,
     gym: "Fit Factory - West",
     focus: "Fat Loss",
     slots: ["Tue 6am", "Thu 6am", "Sun 9am"],
-    bio: "Likes short sessions and consistency."
+    bio: "Short sessions, clean food, high consistency.",
+    photo: makeAvatar("Maya Chen", "#1e1515")
   },
   {
     id: "u-203",
-    name: "Luca",
+    name: "Luca Park",
+    age: 26,
     gym: "Anytime Fitness - Downtown",
     focus: "Muscle Gain",
     slots: ["Mon 7pm", "Fri 7pm", "Sun 5pm"],
-    bio: "Push-pull-legs and protein every day."
+    bio: "Push-pull-legs and protein every day.",
+    photo: makeAvatar("Luca Park", "#12141b")
   },
   {
     id: "u-204",
-    name: "Nina",
+    name: "Nina Brooks",
+    age: 25,
     gym: "Peak Gym - Central",
     focus: "Strength",
     slots: ["Wed 7pm", "Fri 7pm", "Sat 10am"],
-    bio: "Powerlifting beginner, loves clear plans."
+    bio: "Powerlifting beginner who loves clear plans.",
+    photo: makeAvatar("Nina Brooks", "#201414")
+  },
+  {
+    id: "u-205",
+    name: "Sam Rivera",
+    age: 23,
+    gym: "Anytime Fitness - Downtown",
+    focus: "Fat Loss",
+    slots: ["Mon 7pm", "Thu 6am", "Sun 9am"],
+    bio: "Cardio + lifting mix, early morning energy.",
+    photo: makeAvatar("Sam Rivera", "#191919")
+  },
+  {
+    id: "u-206",
+    name: "Jules Kim",
+    age: 27,
+    gym: "Peak Gym - Central",
+    focus: "Muscle Gain",
+    slots: ["Tue 6am", "Fri 7pm", "Sun 5pm"],
+    bio: "Hypertrophy blocks and disciplined recovery.",
+    photo: makeAvatar("Jules Kim", "#1d1111")
   }
 ];
 
@@ -65,9 +105,12 @@ export const getMatches = (profile) => {
 
 export const initialProfile = {
   name: "",
+  age: "24",
   gym: "Anytime Fitness - Downtown",
   focus: "Strength",
-  slots: ["Mon 7pm", "Wed 7pm"]
+  bio: "",
+  slots: ["Mon 7pm", "Wed 7pm"],
+  photo: makeAvatar("You", "#141414", "#ff6f6f")
 };
 
 export const gymOptions = [
@@ -88,3 +131,6 @@ export const slotOptions = [
   "Sun 9am",
   "Sun 5pm"
 ];
+
+export const makeProfileAvatar = (name) =>
+  makeAvatar(name || "You", "#141414", "#ff6f6f");
