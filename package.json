@@ -1,0 +1,24 @@
+{
+  "name": "spot-me",
+  "version": "1.0.0",
+  "description": "Spot-Me is a fast gym buddy matching app. Users fill out a short form, and the system recommends potential gym partners based on **gym location**, **training goals**, and **available time slots**.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ButterJZ/Spot-Me.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ButterJZ/Spot-Me/issues"
+  },
+  "homepage": "https://github.com/ButterJZ/Spot-Me#readme",
+  "dependencies": {
+    "firebase": "^12.10.0"
+  }
+}
