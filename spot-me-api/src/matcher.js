@@ -1,8 +1,9 @@
 function score(user, candidate) {
   const gymMatch = user.gym === candidate.gym ? 1 : 0;
-  const sharedSlots = user.timeSlots.filter(s => candidate.timeSlots.includes(s)).length;
-  const sharedFocus = user.trainingFocus.filter(f => candidate.trainingFocus.includes(f)).length;
-  return gymMatch + sharedSlots + sharedFocus;
+  const timeSlotMatch = user.timeSlot === candidate.timeSlot ? 1 : 0;
+  const sharedDays = user.days.filter(d => candidate.days.includes(d)).length;
+  const sharedFocus = user.focus.filter(f => candidate.focus.includes(f)).length;
+  return gymMatch + timeSlotMatch + sharedDays + sharedFocus;
 }
 
 function getMatches(user, allUsers) {

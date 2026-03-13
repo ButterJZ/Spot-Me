@@ -10,11 +10,11 @@ router.get('/health', (req, res) => {
 });
 
 router.post('/profile', (req, res) => {
-  const { name, gym, trainingFocus, timeSlots } = req.body;
-  if (!name || !gym || !trainingFocus || !timeSlots) {
-    return res.status(400).json({ error: 'name, gym, trainingFocus, and timeSlots are required' });
+  const { name, gym, focus, days, timeSlot } = req.body;
+  if (!name || !gym || !focus || !days || !timeSlot) {
+    return res.status(400).json({ error: 'name, gym, focus, days, and timeSlot are required' });
   }
-  const user = { userId: randomUUID(), name, gym, trainingFocus, timeSlots };
+  const user = { userId: randomUUID(), name, gym, focus, days, timeSlot };
   db.saveUser(user);
   res.status(201).json(user);
 });

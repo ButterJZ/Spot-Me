@@ -13,7 +13,10 @@ describe('GET /api/health', () => {
 });
 
 describe('POST /api/profile', () => {
-  const validBody = { name: 'Alex', gym: 'LA Fitness', trainingFocus: ['chest'], timeSlots: ['Mon 6pm'] };
+  const validBody = {
+    name: 'Alex', gym: 'LA Fitness',
+    focus: ['Chest'], days: ['Mon', 'Wed'], timeSlot: '6pm-7pm'
+  };
 
   test('returns 201 with userId on valid body', async () => {
     const res = await request(app).post('/api/profile').send(validBody);
@@ -23,22 +26,27 @@ describe('POST /api/profile', () => {
   });
 
   test('returns 400 when name is missing', async () => {
-    const res = await request(app).post('/api/profile').send({ gym: 'X', trainingFocus: [], timeSlots: [] });
+    const res = await request(app).post('/api/profile').send({ gym: 'X', focus: [], days: [], timeSlot: '6pm-7pm' });
     expect(res.status).toBe(400);
   });
 
   test('returns 400 when gym is missing', async () => {
-    const res = await request(app).post('/api/profile').send({ name: 'X', trainingFocus: [], timeSlots: [] });
+    const res = await request(app).post('/api/profile').send({ name: 'X', focus: [], days: [], timeSlot: '6pm-7pm' });
     expect(res.status).toBe(400);
   });
 
-  test('returns 400 when trainingFocus is missing', async () => {
-    const res = await request(app).post('/api/profile').send({ name: 'X', gym: 'Y', timeSlots: [] });
+  test('returns 400 when focus is missing', async () => {
+    const res = await request(app).post('/api/profile').send({ name: 'X', gym: 'Y', days: [], timeSlot: '6pm-7pm' });
     expect(res.status).toBe(400);
   });
 
-  test('returns 400 when timeSlots is missing', async () => {
-    const res = await request(app).post('/api/profile').send({ name: 'X', gym: 'Y', trainingFocus: [] });
+  test('returns 400 when days is missing', async () => {
+    const res = await request(app).post('/api/profile').send({ name: 'X', gym: 'Y', focus: [], timeSlot: '6pm-7pm' });
+    expect(res.status).toBe(400);
+  });
+
+  test('returns 400 when timeSlot is missing', async () => {
+    const res = await request(app).post('/api/profile').send({ name: 'X', gym: 'Y', focus: [], days: [] });
     expect(res.status).toBe(400);
   });
 });
@@ -51,7 +59,7 @@ describe('GET /api/matches/:userId', () => {
 
   test('returns empty array when no matches', async () => {
     const profile = await request(app).post('/api/profile').send({
-      name: 'Alex', gym: 'LA Fitness', trainingFocus: ['chest'], timeSlots: ['Mon 6pm']
+      name: 'Alex', gym: 'LA Fitness', focus: ['Chest'], days: ['Mon'], timeSlot: '6pm-7pm'
     });
     const res = await request(app).get(`/api/matches/${profile.body.userId}`);
     expect(res.status).toBe(200);
@@ -60,19 +68,18 @@ describe('GET /api/matches/:userId', () => {
 
   test('returns matches sorted by score', async () => {
     const alex = await request(app).post('/api/profile').send({
-      name: 'Alex', gym: 'LA Fitness', trainingFocus: ['chest'], timeSlots: ['Mon 6pm']
+      name: 'Alex', gym: 'LA Fitness', focus: ['Chest'], days: ['Mon'], timeSlot: '6pm-7pm'
     });
     await request(app).post('/api/profile').send({
-      name: 'Sam', gym: 'LA Fitness', trainingFocus: ['chest'], timeSlots: ['Mon 6pm']
+      name: 'Sam', gym: 'LA Fitness', focus: ['Chest'], days: ['Mon'], timeSlot: '6pm-7pm'
     });
     await request(app).post('/api/profile').send({
-      name: 'Jordan', gym: 'LA Fitness', trainingFocus: ['legs'], timeSlots: ['Fri 5pm']
+      name: 'Jordan', gym: 'Planet Fitness', focus: ['Yoga'], days: ['Tue'], timeSlot: '7am-8am'
     });
-
     const res = await request(app).get(`/api/matches/${alex.body.userId}`);
     expect(res.status).toBe(200);
     expect(res.body.length).toBeGreaterThan(0);
-    expect(res.body[0].name).toBe('Sam'); // highest score
+    expect(res.body[0].name).toBe('Sam');
     expect(res.body[0]).toHaveProperty('score');
   });
 });
