@@ -1,11 +1,12 @@
 import { useMemo, useState } from "react";
 import {
+  dayOptions,
   focusOptions,
   getMatches,
   gymOptions,
   initialProfile,
   makeProfileAvatar,
-  slotOptions
+  timeSlotOptions
 } from "./matches";
 
 const PAGES = {
@@ -16,8 +17,8 @@ const PAGES = {
   DASHBOARD: "dashboard"
 };
 
-const toggleSlot = (slots, slot) =>
-  slots.includes(slot) ? slots.filter((item) => item !== slot) : [...slots, slot];
+const toggleListItem = (items, value) =>
+  items.includes(value) ? items.filter((item) => item !== value) : [...items, value];
 
 const updateProfileFromEvent = (setProfile, field) => (event) =>
   setProfile((prev) => ({ ...prev, [field]: event.target.value }));
@@ -67,11 +68,26 @@ function App() {
     const safeProfile = {
       ...profile,
       name: profile.name || "You",
-      photo: makeProfileAvatar(profile.name || "You")
+      photo: profile.photo || makeProfileAvatar(profile.name || "You")
     };
     setSubmittedProfile(safeProfile);
     setProfile(safeProfile);
     setPage(PAGES.DASHBOARD);
+  };
+
+  const handlePhotoUpload = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (typeof reader.result === "string") {
+        setProfile((prev) => ({ ...prev, photo: reader.result }));
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const moveCard = (direction) => {
@@ -213,16 +229,23 @@ function App() {
               </label>
               <label>
                 Training Focus
-                <select
-                  value={profile.focus}
-                  onChange={updateProfileFromEvent(setProfile, "focus")}
-                >
+                <div className="chips focus-chips">
                   {focusOptions.map((focus) => (
-                    <option key={focus} value={focus}>
+                    <button
+                      key={focus}
+                      type="button"
+                      className={profile.focuses.includes(focus) ? "chip active" : "chip"}
+                      onClick={() =>
+                        setProfile((prev) => ({
+                          ...prev,
+                          focuses: toggleListItem(prev.focuses, focus)
+                        }))
+                      }
+                    >
                       {focus}
-                    </option>
+                    </button>
                   ))}
-                </select>
+                </div>
               </label>
               <label>
                 Bio
@@ -233,25 +256,47 @@ function App() {
                   placeholder="What training vibe are you looking for?"
                 />
               </label>
+              <label>
+                Upload Photo
+                <input type="file" accept="image/*" onChange={handlePhotoUpload} />
+              </label>
 
-              <fieldset>
+              <fieldset className="availability-field">
                 <legend>Available Slots</legend>
-                <div className="chips">
-                  {slotOptions.map((slot) => (
-                    <button
-                      key={slot}
-                      type="button"
-                      className={profile.slots.includes(slot) ? "chip active" : "chip"}
-                      onClick={() =>
-                        setProfile((prev) => ({
-                          ...prev,
-                          slots: toggleSlot(prev.slots, slot)
-                        }))
-                      }
+                <div className="availability-grid">
+                  <section>
+                    <p className="slot-label">Days</p>
+                    <div className="day-chips">
+                      {dayOptions.map((day) => (
+                        <button
+                          key={day}
+                          type="button"
+                          className={profile.days.includes(day) ? "chip active" : "chip"}
+                          onClick={() =>
+                            setProfile((prev) => ({
+                              ...prev,
+                              days: toggleListItem(prev.days, day)
+                            }))
+                          }
+                        >
+                          {day}
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+                  <label className="timeslot-select">
+                    Time Slot
+                    <select
+                      value={profile.timeSlot}
+                      onChange={updateProfileFromEvent(setProfile, "timeSlot")}
                     >
-                      {slot}
-                    </button>
-                  ))}
+                      {timeSlotOptions.map((timeSlot) => (
+                        <option key={timeSlot} value={timeSlot}>
+                          {timeSlot}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
                 </div>
               </fieldset>
               <button type="submit" className="cta">
@@ -264,11 +309,14 @@ function App() {
             <p className="muted-text">Live Preview</p>
             <img
               className="profile-photo large"
-              src={makeProfileAvatar(profile.name || "You")}
+              src={profile.photo || makeProfileAvatar(profile.name || "You")}
               alt="Profile preview"
             />
             <h3>{profile.name || "You"}</h3>
-            <p className="muted-text">{profile.focus}</p>
+            <p className="muted-text">{profile.focuses.join(", ")}</p>
+            <p className="muted-text">
+              {profile.days.join(" / ")} - {profile.timeSlot}
+            </p>
             <p>{profile.bio || "No bio yet."}</p>
           </aside>
         </section>
@@ -302,7 +350,10 @@ function App() {
           />
           <h2>{submittedProfile.name || "You"}</h2>
           <p className="meta">{submittedProfile.gym}</p>
-          <p className="meta">{submittedProfile.focus}</p>
+          <p className="meta">{submittedProfile.focuses.join(", ")}</p>
+          <p className="meta">
+            {submittedProfile.days.join(" / ")} - {submittedProfile.timeSlot}
+          </p>
           <div className="kpi-row">
             <article>
               <p className="kpi-num">{matches.length}</p>
@@ -337,7 +388,10 @@ function App() {
                 </h3>
                 <p>{currentMatch.bio}</p>
                 <p className="meta">{currentMatch.gym}</p>
-                <p className="meta">Focus: {currentMatch.focus}</p>
+                <p className="meta">Focus: {currentMatch.focus.join(", ")}</p>
+                <p className="meta">
+                  Availability: {currentMatch.days.join(" / ")} - {currentMatch.timeSlot}
+                </p>
                 <ul>
                   {currentMatch.reasons.map((reason) => (
                     <li key={reason}>{reason}</li>
@@ -374,7 +428,7 @@ function App() {
                     <img className="profile-photo mini" src={person.photo} alt={person.name} />
                     <div>
                       <p>{person.name}</p>
-                      <p className="muted-text tiny">{person.focus}</p>
+                      <p className="muted-text tiny">{person.focus.join(", ")}</p>
                     </div>
                   </li>
                 ))}
@@ -384,20 +438,22 @@ function App() {
 
           <article className="panel feed-panel">
             <h2>Upcoming Sessions</h2>
-            <ul className="sessions">
-              <li>
-                <span>Mon 7pm</span>
-                <span className="muted-text">Leg day plan</span>
-              </li>
-              <li>
-                <span>Wed 7pm</span>
-                <span className="muted-text">Upper body split</span>
-              </li>
-              <li>
-                <span>Sat 10am</span>
-                <span className="muted-text">Cardio + core</span>
-              </li>
-            </ul>
+            {submittedProfile.days.length === 0 ? (
+              <p className="muted-text">Add available days in onboarding to see sessions.</p>
+            ) : (
+              <ul className="sessions">
+                {submittedProfile.days.slice(0, 3).map((day) => (
+                  <li key={day}>
+                    <span>
+                      {day} {submittedProfile.timeSlot}
+                    </span>
+                    <span className="muted-text">
+                      {submittedProfile.focuses[0] || "Workout"} session
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </article>
         </section>
       </section>

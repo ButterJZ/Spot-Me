@@ -240,6 +240,10 @@ fieldset {
   gap: 8px;
 }
 
+.focus-chips {
+  margin-top: 10px;
+}
+
 .chip {
   border-radius: 999px;
   border: 1px solid #323232;
@@ -251,6 +255,55 @@ fieldset {
 .chip.active {
   border-color: #ff4e4e;
   color: #ff7f7f;
+}
+
+.availability-field {
+  margin-top: 16px;
+  border: 1px solid #292929;
+  border-radius: 12px;
+  padding: 12px;
+  background: #0d0d0d;
+}
+
+.availability-field legend {
+  padding: 0 8px;
+  color: #e8e8e8;
+  font-weight: 600;
+}
+
+.availability-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.slot-label {
+  margin-bottom: 8px;
+  color: #a9a9a9;
+  font-size: 0.86rem;
+}
+
+.day-chips {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.day-chips .chip {
+  border-radius: 9px;
+  width: 100%;
+  text-align: center;
+  padding: 8px 6px;
+}
+
+.timeslot-select {
+  margin: 0;
+}
+
+input[type="file"] {
+  padding: 9px;
+  cursor: pointer;
 }
 
 .dashboard-topbar {
@@ -409,5 +462,13 @@ fieldset {
   .match-photo {
     border-right: none;
     border-bottom: 1px solid #242424;
+  }
+
+  .availability-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .day-chips {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
